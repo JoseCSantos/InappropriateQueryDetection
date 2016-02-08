@@ -54,6 +54,16 @@ public class Eval {
     double prec = ((tp+fp)>0)?tp/(tp+fp):0.0;
     double rec = ((tp+fn)>0)?tp/(tp+fn):0.0;
     double f1 = ((prec+rec)>0)?(2.0*prec*rec)/(prec+rec):0.0;
+    // Draw confusion matrix
+    System.out.printf("    Predicted  (actuals in rows)\n");
+    System.out.printf("   |   1|   0| Totals\n");
+    System.out.printf("---------------------\n");
+    System.out.printf("  1|%4.0f|%4.0f| %4.0f\n", tp, fn, tp+fn);
+    System.out.printf("---------------------\n");
+    System.out.printf("  0|%4.0f|%4.0f| %4.0f\n", fp, tn, fp+tn);
+    System.out.printf("---------------------\n");
+    System.out.printf("Tot|%4.0f|%4.0f| %4.0f\n", tp+fp, fn+tn, tp+fn+fp+tn);
+
 //    System.out.printf("tp = %d\n 
     System.out.printf("\nEval\n----\n\nprec\t= %.4f\nrec\t= %.4f\nf1\t= %.4f\n", prec, rec, f1);
 
