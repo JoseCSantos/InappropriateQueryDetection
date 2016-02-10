@@ -157,13 +157,13 @@ public class FormatData {
     FormatData data = new FormatData();
     String operation = System.getProperty("operation");
     if(operation==null || (!operation.trim().equals("extractFeatures") && !operation.trim().equals("svmFormat"))) {
-        System.out.printf("\n\nUsage: sh run.sh -Doperation=extractFeatures eval.Eval <input-data> <feature-map-output>\n\nOR");
-        System.out.printf("\n\nUsage: sh run.sh -Doperation=svmFormat eval.Eval <input-feature-map> <input-data> <svm-data-output>\n\n");
+        System.out.printf("\n\nUsage: sh run.sh -Doperation=extractFeatures io.FormatData <input-data> <feature-map-output>\n\nOR");
+        System.out.printf("\n\nUsage: sh run.sh -Doperation=svmFormat io.FormatData <input-feature-map> <input-data> <svm-data-output>\n\n");
         System.exit(0);
     }
     if(operation.trim().equals("extractFeatures")) {
       if(args.length!=2) {
-        System.out.printf("\n\nUsage: sh run.sh -Doperation=extractFeatures eval.Eval <input-data> <feature-map-output>\n\n");
+        System.out.printf("\n\nUsage: sh run.sh -Doperation=extractFeatures io.FormatData <input-data> <feature-map-output>\n\n");
         System.exit(0);
       }
 
@@ -174,7 +174,7 @@ public class FormatData {
     }
     else if(operation.equals("svmFormat")) {
       if(args.length!=3) {
-        System.out.printf("\n\nUsage: sh run.sh -Doperation=svmFormat eval.Eval <input-feature-map> <input-data> <svm-data-output>\n\n");
+        System.out.printf("\n\nUsage: sh run.sh -Doperation=svmFormat io.FormatData <input-feature-map> <input-data> <svm-data-output>\n\n");
         System.exit(0);
       }
       data.loadFeatures(args[0]);
