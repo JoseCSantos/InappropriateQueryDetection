@@ -42,8 +42,8 @@ y_predicted = clf.predict( train_set )
 score_train = clf.score( train_set, trainY )
 y_predicted = clf.predict( test_set )
 score_test = clf.score( test_set, testY )
-print "DTC"
-print precision_recall_fscore_support(testY, y_predicted, average='binary')
+print ("DTC")
+print (precision_recall_fscore_support(testY, y_predicted, average='binary'))
                     
 
 ##RFC
@@ -57,8 +57,8 @@ y_predicted = clf.predict( train_set )
 score_train = clf.score( train_set, trainY )
 y_predicted = clf.predict( test_set )
 score_test = clf.score( test_set, testY )
-print "RFC"
-print precision_recall_fscore_support(testY, y_predicted, average='binary')
+print ("RFC")
+print (precision_recall_fscore_support(testY, y_predicted, average='binary'))
 
 
 ## ETR
@@ -72,6 +72,6 @@ y_predicted = clf.predict( train_set )
 score_train = clf.score( train_set, trainY )
 y_predicted = clf.predict( test_set )
 score_test = clf.score( test_set, testY )
-print "ETR"
-print precision_recall_fscore_support(testY, y_predicted, average='binary')
+print ("ETR")
+print (precision_recall_fscore_support(testY, y_predicted, average='binary'))
 
