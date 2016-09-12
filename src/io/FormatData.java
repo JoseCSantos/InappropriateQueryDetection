@@ -24,6 +24,7 @@ public class FormatData {
   Set<String> vocab;
   Map<Integer, String> featureMap;
   Map<String, Integer> revFeatureMap;
+  public static String LABEL_TYPE = "string";
 
   public FormatData() {
     this.vocab = new HashSet<String>();
@@ -121,13 +122,17 @@ public class FormatData {
     while((line = br.readLine())!=null) {
       String[] field = line.split("\t");
       String query = field[0].trim();
-      int label = (Double.parseDouble(field[1].trim()))>=0.2?1:0;
+      String label = "";
+      if(LABEL_TYPE!="string")
+        label = (Double.parseDouble(field[1].trim()))>=0.2?"1":"0";
+      else
+        label = (field[1].trim().equals("NonOffensive"))?"0":"1";
       String[] terms = field[0].toLowerCase().trim().split(" ");
       Map<Integer, Double> countVector = new HashMap<Integer, Double>();
       for(String term: terms) {
         List<String> grams = nGrams("$"+term+"$", 3);
         for(String gram: grams) {
-	  int id = (this.revFeatureMap.containsKey(gram))?this.revFeatureMap.get(gram):-1;
+	        int id = (this.revFeatureMap.containsKey(gram))?this.revFeatureMap.get(gram):-1;
           if(countVector.containsKey(id) && id!=-1) {
             countVector.put(id, countVector.get(id)+1.0);
           }
@@ -140,9 +145,61 @@ public class FormatData {
       Collections.sort(ids);
 
       if(ids.size()>0) {
-        p.printf("%d ", label);
+        p.printf("%s ", label);
         for(int feature: ids) {
             p.printf("%d:%.2f ", feature, countVector.get(feature));
+        }
+        p.printf("\n");
+      }
+    }
+    br.close();
+
+    p.close();
+    fos.close();
+  }
+  
+  public void svmFormatDSSM(String dataFile, String svmDataFile) throws IOException {
+    BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(dataFile), "UTF-8"));
+
+    FileOutputStream fos = new FileOutputStream(svmDataFile);
+    PrintStream p = new PrintStream(fos);
+
+    String line = "";
+    while((line = br.readLine())!=null) {
+      String[] field = line.split("\t");
+      String query = field[0].trim();
+      String partition = field[1].trim();
+      String label = "";
+
+      
+      if(LABEL_TYPE!="string")
+        label = (Double.parseDouble(field[2].trim()))>=0.2?"1":"0";
+      else
+        label = (field[2].trim().equals("NonOffensive"))?"0":"1";
+      String[] terms = field[0].toLowerCase().trim().split(" ");
+      Map<Integer, Double> countVector = new HashMap<Integer, Double>();
+      for(String term: terms) {
+        List<String> grams = nGrams("$"+term+"$", 3);
+        for(String gram: grams) {
+	        int id = (this.revFeatureMap.containsKey(gram))?this.revFeatureMap.get(gram):-1;
+          if(countVector.containsKey(id) && id!=-1) {
+            countVector.put(id, countVector.get(id)+1.0);
+          }
+          else if(id!=-1){
+            countVector.put(id, 1.0);
+          }
+        }
+      }
+      List<Integer> ids = new ArrayList<Integer>(countVector.keySet());
+      Collections.sort(ids);
+
+      if(ids.size()>0) {
+        p.printf("%s %s ", partition, label);
+        for(int i=3; i< field.length; i++) {
+          p.printf("%d:%s ", i-3, field[i]);
+        }
+        for(int feature: ids) {
+            p.printf("%d:%.2f ", feature+field.length-2, countVector.get(feature));
         }
         p.printf("\n");
       }
@@ -157,13 +214,13 @@ public class FormatData {
     FormatData data = new FormatData();
     String operation = System.getProperty("operation");
     if(operation==null || (!operation.trim().equals("extractFeatures") && !operation.trim().equals("svmFormat"))) {
-        System.out.printf("\n\nUsage: sh run.sh -Doperation=extractFeatures eval.Eval <input-data> <feature-map-output>\n\nOR");
-        System.out.printf("\n\nUsage: sh run.sh -Doperation=svmFormat eval.Eval <input-feature-map> <input-data> <svm-data-output>\n\n");
+        System.out.printf("\n\nUsage: sh run.sh -Doperation=extractFeatures io.FormatData <input-data> <feature-map-output>\n\nOR");
+        System.out.printf("\n\nUsage: sh run.sh -Doperation=svmFormat io.FormatData <input-feature-map> <input-data> <svm-data-output>\n\n");
         System.exit(0);
     }
     if(operation.trim().equals("extractFeatures")) {
       if(args.length!=2) {
-        System.out.printf("\n\nUsage: sh run.sh -Doperation=extractFeatures eval.Eval <input-data> <feature-map-output>\n\n");
+        System.out.printf("\n\nUsage: sh run.sh -Doperation=extractFeatures io.FormatData <input-data> <feature-map-output>\n\n");
         System.exit(0);
       }
 
@@ -174,11 +231,11 @@ public class FormatData {
     }
     else if(operation.equals("svmFormat")) {
       if(args.length!=3) {
-        System.out.printf("\n\nUsage: sh run.sh -Doperation=svmFormat eval.Eval <input-feature-map> <input-data> <svm-data-output>\n\n");
+        System.out.printf("\n\nUsage: sh run.sh -Doperation=svmFormat io.FormatData <input-feature-map> <input-data> <svm-data-output>\n\n");
         System.exit(0);
       }
       data.loadFeatures(args[0]);
-      data.svmFormat(args[1], args[2]);
+      data.svmFormatDSSM(args[1], args[2]);
       System.out.printf("The data is converted to SVM format and stored in: %s\n", args[2]);
     }
 

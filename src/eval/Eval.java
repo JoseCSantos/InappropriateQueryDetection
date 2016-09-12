@@ -21,7 +21,7 @@ public class Eval {
     BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), "UTF-8"));
     String line = "";
     while((line = br.readLine())!=null) {
-      String[] field = line.split(" ");
+      String[] field = line.trim().split(" ");
       int label = Integer.parseInt(field[0].trim());
       labels.add(label);
     }
